@@ -477,3 +477,38 @@ tr.warning-row {
     align-items: flex-start;
   }
 }
+
+/* 층별총집계표 2단 헤더 고정 보정 */
+.excel-view-container table thead tr:first-child th {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: #f1f5f9;
+}
+
+.excel-view-container table thead tr:nth-child(2) th {
+  position: sticky;
+  top: 43px;
+  z-index: 29;
+  background: #f1f5f9;
+}
+
+.excel-view-container table thead th[rowspan="2"] {
+  z-index: 31;
+}
+
+/* 헤더 높이 고정 */
+.excel-view-container table thead th {
+  height: 43px;
+  vertical-align: middle;
+}
+
+/* 스크롤 시 본문이 헤더 뒤로 비치지 않도록 */
+.excel-view-container {
+  background: #fff;
+}
+
+.excel-view-container table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
