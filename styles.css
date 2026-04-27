@@ -101,6 +101,12 @@ body {
   font-weight: 700;
 }
 
+.sheet-btn.floor-target {
+  background: #e67e22;
+  color: #fff;
+  font-weight: 800;
+}
+
 .sheet-btn.active {
   outline: 2px solid #93c5fd;
 }
@@ -138,7 +144,7 @@ body {
   padding: 10px 14px;
   color: #475569;
   font-size: 14px;
-  max-width: 360px;
+  max-width: 420px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -230,6 +236,11 @@ button {
   color: #1d4ed8;
 }
 
+.success {
+  background: #10b981;
+  color: #fff;
+}
+
 .disabled,
 button:disabled {
   background: #e5e7eb;
@@ -271,10 +282,11 @@ button:disabled {
 }
 
 .hidden {
-  display: none;
+  display: none !important;
 }
 
-.table-wrap {
+.table-wrap,
+.excel-view-container {
   overflow: auto;
   max-height: 650px;
   border: 1px solid #e5e7eb;
@@ -335,6 +347,108 @@ tr.warning-row {
 .qc-badge.normal {
   background: #dcfce7;
   color: #166534;
+}
+
+.floor-subview {
+  margin-top: 22px;
+}
+
+.mapping-container {
+  border: 1px solid #d9e1ef;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.list-header,
+.item-row {
+  display: grid;
+  grid-template-columns: 70px 1.4fr 1fr 180px;
+  gap: 12px;
+  align-items: center;
+}
+
+.list-header {
+  background: #f4f7fd;
+  padding: 14px;
+  font-weight: 800;
+  border-bottom: 1px solid #d9e1ef;
+}
+
+.mapping-list {
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.item-row {
+  padding: 12px 14px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.item-row.cat-콘크리트,
+.row-cat-콘크리트 td {
+  background-color: #eef4ff !important;
+}
+
+.item-row.cat-철근,
+.row-cat-철근 td {
+  background-color: #f0fcf4 !important;
+}
+
+.item-row.cat-거푸집,
+.row-cat-거푸집 td {
+  background-color: #fff9ec !important;
+}
+
+.item-row.cat-etc,
+.row-cat-etc td {
+  background-color: #fff !important;
+}
+
+.input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d9e1ef;
+  border-radius: 10px;
+  outline: none;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.area-input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  text-align: right;
+  font-weight: 700;
+  color: #1d4ed8;
+  outline: none;
+}
+
+.area-input:focus {
+  background: #fffde7;
+  outline: 2px solid #e67e22;
+  border-radius: 4px;
+}
+
+.row-subtotal td {
+  background: #f1f3f5 !important;
+  font-weight: 800;
+}
+
+.row-ratio td {
+  font-weight: 800;
+}
+
+.col-total {
+  background: #f8f9fa !important;
+  font-weight: 800;
+  color: #1d4ed8;
 }
 
 @media (max-width: 1100px) {
