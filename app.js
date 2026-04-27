@@ -139,12 +139,18 @@ function selectSheet(sheetName, button) {
   selectedSheet.textContent = sheetName;
 
   if (isFloorSheet(sheetName)) {
-    normalQcPanel.classList.add("hidden");
-    floorSummaryPanel.classList.remove("hidden");
-    resetNormalQcTableOnly();
-    resultMessage.textContent = "층별총집계표 분석 기능을 사용할 수 있습니다.";
-    return;
-  }
+  normalQcPanel.classList.add("hidden");
+  floorSummaryPanel.classList.remove("hidden");
+
+  document.querySelector(".cards").classList.add("hidden");
+     normalQcPanel.classList.remove("hidden");
+floorSummaryPanel.classList.add("hidden");
+document.querySelector(".cards").classList.remove("hidden");
+  resetNormalQcTableOnly();
+
+  resultMessage.textContent = "층별총집계표 분석 기능을 사용할 수 있습니다.";
+  return;
+}
 
   normalQcPanel.classList.remove("hidden");
   floorSummaryPanel.classList.add("hidden");
