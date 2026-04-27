@@ -34,7 +34,7 @@
       <header class="topbar">
         <div>
           <h2>1차 QC 검토 화면</h2>
-          <p>산출식 열 안의 숫자값을 기준으로 수기입력 오류 가능성을 빠르게 확인합니다.</p>
+          <p>산출식 열 안의 수기입력 의심 숫자를 기준으로 과도한 입력값을 빠르게 확인합니다.</p>
         </div>
         <div class="file-name" id="fileName">업로드된 파일 없음</div>
       </header>
@@ -79,7 +79,8 @@
           <input type="number" id="manualLimit" min="0" max="9999" placeholder="0~9999 입력" />
           <button id="runManualCheck">검토 실행</button>
           <p>
-            예: 500 입력 시, <b>산출식</b> 열 안에 500보다 큰 숫자가 포함된 행을 경고로 표시합니다.
+            예: 300 입력 시, <b>산출식</b> 열에서 <b>= 뒤 계산 결과값은 제외</b>하고,
+            앞쪽 수기입력 의심 숫자 중 300보다 큰 값이 있는 행만 표시합니다.
           </p>
         </div>
       </section>
@@ -90,7 +91,10 @@
             <h3>검토 결과</h3>
             <p id="resultMessage">엑셀을 업로드한 후 시트를 선택하세요.</p>
           </div>
-          <button id="showAllBtn" class="sub" disabled>전체 행 보기</button>
+          <div class="result-actions">
+            <button id="showWarningBtn" class="sub" disabled>경고 행 보기</button>
+            <button id="showAllBtn" class="sub" disabled>전체 행 일부 보기</button>
+          </div>
         </div>
 
         <div class="table-wrap">
