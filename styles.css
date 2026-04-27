@@ -7,7 +7,7 @@ body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", sans-serif;
   background: #f4f6f8;
-  color: #1f2937;
+  color: #111827;
 }
 
 .app {
@@ -138,6 +138,10 @@ body {
   padding: 10px 14px;
   color: #475569;
   font-size: 14px;
+  max-width: 360px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .cards {
@@ -187,6 +191,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
 }
 
 .panel h3 {
@@ -200,7 +205,8 @@ body {
   line-height: 1.6;
 }
 
-.qc-actions {
+.qc-actions,
+.result-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
@@ -224,7 +230,8 @@ button {
   color: #1d4ed8;
 }
 
-.disabled {
+.disabled,
+button:disabled {
   background: #e5e7eb;
   color: #9ca3af;
   cursor: not-allowed;
@@ -269,7 +276,7 @@ button {
 
 .table-wrap {
   overflow: auto;
-  max-height: 620px;
+  max-height: 650px;
   border: 1px solid #e5e7eb;
   border-radius: 16px;
 }
@@ -297,6 +304,7 @@ td {
   border-bottom: 1px solid #e5e7eb;
   font-size: 13px;
   vertical-align: top;
+  white-space: nowrap;
 }
 
 tr.warning-row {
@@ -304,10 +312,10 @@ tr.warning-row {
 }
 
 .match-number {
-  background: #fecaca;
-  color: #991b1b;
+  background: #fff200;
+  color: #111827;
   padding: 1px 4px;
-  border-radius: 6px;
+  border-radius: 5px;
   font-weight: 800;
 }
 
@@ -349,9 +357,9 @@ tr.warning-row {
     grid-template-columns: 1fr;
   }
 
-  .topbar {
+  .topbar,
+  .panel-head.row {
     flex-direction: column;
     align-items: flex-start;
-    gap: 12px;
   }
 }
