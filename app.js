@@ -47,6 +47,7 @@ const showWarningBtn = $("showWarningBtn");
 const normalQcPanel = $("normalQcPanel");
 const floorSummaryPanel = $("floorSummaryPanel");
 const floorSubView = $("floorSubView");
+const cardsPanel = document.querySelector(".cards");
 
 const targetSheetNames = ["부재별산출서", "아파트옹벽 Unit별산출서"];
 const floorSheetKeyword = "층별총집계표";
@@ -139,21 +140,22 @@ function selectSheet(sheetName, button) {
   selectedSheet.textContent = sheetName;
 
   if (isFloorSheet(sheetName)) {
-  normalQcPanel.classList.add("hidden");
-  floorSummaryPanel.classList.remove("hidden");
+    normalQcPanel.classList.add("hidden");
+    floorSummaryPanel.classList.remove("hidden");
+    cardsPanel.classList.add("hidden");
 
-  document.querySelector(".cards").classList.add("hidden");
-     normalQcPanel.classList.remove("hidden");
-floorSummaryPanel.classList.add("hidden");
-document.querySelector(".cards").classList.remove("hidden");
-  resetNormalQcTableOnly();
+    resetNormalQcTableOnly();
 
-  resultMessage.textContent = "층별총집계표 분석 기능을 사용할 수 있습니다.";
-  return;
-}
+    showAllBtn.disabled = true;
+    showWarningBtn.disabled = true;
+
+    resultMessage.textContent = "층별총집계표 분석 기능을 사용할 수 있습니다.";
+    return;
+  }
 
   normalQcPanel.classList.remove("hidden");
   floorSummaryPanel.classList.add("hidden");
+  cardsPanel.classList.remove("hidden");
 
   const sheet = workbook.Sheets[sheetName];
 
@@ -436,10 +438,6 @@ async function parseFloorSummary() {
   $("btnArea").disabled = false;
   $("btnFloorView").disabled = false;
   $("btnFloorExcel").disabled = false;
-
-  totalRows.textContent = floorState.floors.length;
-  warningRows.textContent = floorState.rawItems.length;
-  limitValue.textContent = "-";
 
   resultMessage.textContent =
     `층별총집계표 분석 완료: 동 ${floorState.dongs.length}개, 층 ${floorState.floors.length}개, 아이템 ${floorState.rawItems.length}개를 인식했습니다.`;
@@ -1074,6 +1072,7 @@ function resetNormalQcView() {
   showWarningBtn.disabled = true;
   manualInputArea.classList.add("hidden");
 
+  cardsPanel.classList.remove("hidden");
   normalQcPanel.classList.remove("hidden");
   floorSummaryPanel.classList.add("hidden");
 
