@@ -5,6 +5,7 @@ let currentRows = [];
 let currentHeader = [];
 let currentHeaderRowIndex = -1;
 let currentFormulaColIndex = -1;
+let currentResultColIndex = -1;
 let lastFilteredRows = [];
 let lastLimit = null;
 
@@ -125,6 +126,8 @@ function selectSheet(sheetName, button) {
   currentHeader = parsed.header;
   currentHeaderRowIndex = parsed.headerRowIndex;
   currentFormulaColIndex = parsed.formulaColIndex;
+  currentResultColIndex = parsed.resultColIndex;
+
   lastFilteredRows = [];
   lastLimit = null;
 
@@ -172,7 +175,8 @@ function parseSheetRows(rows) {
       header: [],
       dataRows: [],
       headerRowIndex: -1,
-      formulaColIndex: -1
+      formulaColIndex: -1,
+      resultColIndex: -1
     };
   }
 
@@ -180,6 +184,8 @@ function parseSheetRows(rows) {
     const text = String(cell || "").trim();
     return text || `열${index + 1}`;
   });
+
+  const resultColIndex = findResultColumnIndex(header);
 
   const dataRows = rows
     .slice(headerRowIndex + 1)
@@ -195,8 +201,16 @@ function parseSheetRows(rows) {
     header,
     dataRows,
     headerRowIndex,
-    formulaColIndex
+    formulaColIndex,
+    resultColIndex
   };
+}
+
+function findResultColumnIndex(header) {
+  return header.findIndex(head => {
+    const value = String(head || "").replace(/\s/g, "");
+    return value.includes("결과값") || value.includes("결과");
+  });
 }
 
 function normalizeRow(row, length) {
@@ -230,6 +244,9 @@ function runManualErrorCheck() {
 
     if (!formulaText) continue;
 
+    // 결과값이 0이거나 비어 있는 행 제외
+    if (isZeroOrEmptyResult(row)) continue;
+
     const targetNumbers = extractManualInputNumbersOnly(formulaText);
     const overNumbers = targetNumbers.filter(num => num > limit);
 
@@ -253,14 +270,34 @@ function runManualErrorCheck() {
   if (lastFilteredRows.length > PAGE_SIZE_WARNING) {
     resultMessage.textContent =
       `산출식 열의 수기입력 영역에서 ${limit}보다 큰 숫자가 포함된 행 ${lastFilteredRows.length}건을 찾았습니다. ` +
-      `속도 개선을 위해 상위 ${PAGE_SIZE_WARNING}건만 먼저 표시합니다.`;
+      `단, 결과값이 0이거나 빈 행은 제외했습니다. 속도 개선을 위해 상위 ${PAGE_SIZE_WARNING}건만 먼저 표시합니다.`;
   } else if (lastFilteredRows.length > 0) {
     resultMessage.textContent =
-      `산출식 열의 수기입력 영역에서 ${limit}보다 큰 숫자가 포함된 행 ${lastFilteredRows.length}건을 찾았습니다.`;
+      `산출식 열의 수기입력 영역에서 ${limit}보다 큰 숫자가 포함된 행 ${lastFilteredRows.length}건을 찾았습니다. ` +
+      `단, 결과값이 0이거나 빈 행은 제외했습니다.`;
   } else {
     resultMessage.textContent =
-      `산출식 열의 수기입력 영역에서 ${limit}보다 큰 숫자가 포함된 행이 없습니다.`;
+      `산출식 열의 수기입력 영역에서 ${limit}보다 큰 숫자가 포함된 행이 없습니다. ` +
+      `결과값이 0이거나 빈 행은 제외했습니다.`;
   }
+}
+
+function isZeroOrEmptyResult(row) {
+  if (currentResultColIndex === -1) return false;
+
+  const rawValue = String(row.values[currentResultColIndex] || "").trim();
+
+  if (!rawValue) return true;
+
+  const cleanedValue = rawValue
+    .replace(/,/g, "")
+    .replace(/\s/g, "");
+
+  const numericValue = Number(cleanedValue);
+
+  if (Number.isNaN(numericValue)) return false;
+
+  return numericValue === 0;
 }
 
 function extractManualInputNumbersOnly(text) {
@@ -320,7 +357,15 @@ function renderTable(rows, limit, warningOnly) {
 
   currentHeader.forEach((head, index) => {
     const th = document.createElement("th");
-    th.textContent = index === currentFormulaColIndex ? `${head} ★` : head;
+
+    if (index === currentFormulaColIndex) {
+      th.textContent = `${head} ★`;
+    } else if (index === currentResultColIndex) {
+      th.textContent = `${head} ※`;
+    } else {
+      th.textContent = head;
+    }
+
     headerRow.appendChild(th);
   });
 
@@ -419,6 +464,7 @@ function resetView() {
   currentHeader = [];
   currentHeaderRowIndex = -1;
   currentFormulaColIndex = -1;
+  currentResultColIndex = -1;
   lastFilteredRows = [];
   lastLimit = null;
 
