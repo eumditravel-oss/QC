@@ -4,9 +4,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>구조 산출서 1차 QC</title>
+  <title>구조 산출서 통합 QC</title>
   <link rel="stylesheet" href="styles.css" />
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 </head>
 <body>
   <div class="app">
@@ -14,14 +16,14 @@
       <div class="brand">
         <div class="logo">QC</div>
         <div>
-          <h1>구조 산출서 QC</h1>
-          <p>부재별 / Unit별 산출서 검토</p>
+          <h1>구조 통합 QC</h1>
+          <p>산출서 / 층별총집계표 검토</p>
         </div>
       </div>
 
       <div class="upload-box">
         <label for="excelFile">엑셀 업로드</label>
-        <input type="file" id="excelFile" accept=".xlsx,.xls" />
+        <input type="file" id="excelFile" accept=".xlsx,.xls" multiple />
       </div>
 
       <div class="side-section">
@@ -33,8 +35,8 @@
     <main class="main">
       <header class="topbar">
         <div>
-          <h2>1차 QC 검토 화면</h2>
-          <p>산출식 열 안의 수기입력 의심 숫자를 기준으로 과도한 입력값을 빠르게 확인합니다.</p>
+          <h2>구조 산출서 통합 QC 화면</h2>
+          <p>부재별산출서, 아파트옹벽 Unit별산출서, 층별총집계표를 한 화면에서 검토합니다.</p>
         </div>
         <div class="file-name" id="fileName">업로드된 파일 없음</div>
       </header>
@@ -58,12 +60,10 @@
         </div>
       </section>
 
-      <section class="panel">
+      <section id="normalQcPanel" class="panel">
         <div class="panel-head">
-          <div>
-            <h3>QC 기능 버튼</h3>
-            <p>현재 활성화 기능: 1. 수기입력 오류 확인</p>
-          </div>
+          <h3>산출서 QC 기능</h3>
+          <p>부재별산출서 또는 아파트옹벽 Unit별산출서에서 산출식 열의 수기입력 의심 숫자를 검토합니다.</p>
         </div>
 
         <div class="qc-actions">
@@ -79,12 +79,27 @@
           <input type="number" id="manualLimit" min="0" max="9999" placeholder="0~9999 입력" />
           <button id="runManualCheck">검토 실행</button>
           <p>
-            예: 500 입력 시, <b>산출식</b> 열에서 <b>= 뒤 계산 결과값은 제외</b>하고,
-            앞쪽 수기입력 의심 숫자 중 500보다 큰 값이 있는 행만 표시합니다.
-            <br />
-            단, <b>결과값이 0이거나 빈 행은 제외</b>합니다.
+            산출식에서 <b>= 뒤 계산 결과값 제외</b>, <b>/1000 단위변환값 제외</b>,
+            <b>결과값 0 또는 빈 행 제외</b> 후 기준값보다 큰 수기입력 의심값만 표시합니다.
           </p>
         </div>
+      </section>
+
+      <section id="floorSummaryPanel" class="panel hidden">
+        <div class="panel-head">
+          <h3>층별총집계표 분석</h3>
+          <p>층별총집계표를 기준으로 콘크리트, 철근, 거푸집 수량과 면적 대비 지표를 분석합니다.</p>
+        </div>
+
+        <div class="qc-actions">
+          <button id="btnFloorParse" class="primary">1. 층별 총집계 분석</button>
+          <button id="btnMapping" class="sub" disabled>2. 아이템 분류 설정</button>
+          <button id="btnArea" class="sub" disabled>3. 면적 입력</button>
+          <button id="btnFloorView" class="sub" disabled>4. 통합 수량표 확인</button>
+          <button id="btnFloorExcel" class="success" disabled>5. 템플릿 엑셀 다운로드</button>
+        </div>
+
+        <div id="floorSubView" class="floor-subview"></div>
       </section>
 
       <section class="panel">
