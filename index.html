@@ -4,8 +4,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>구조 적산 1차 QC 기획안</title>
+  <title>구조 산출서 1차 QC</title>
   <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 <body>
   <div class="app">
@@ -13,208 +14,90 @@
       <div class="brand">
         <div class="logo">QC</div>
         <div>
-          <h1>Structural QC</h1>
-          <p>구조 적산 1차 검토 시스템</p>
+          <h1>구조 산출서 QC</h1>
+          <p>부재별 / Unit별 산출서 검토</p>
         </div>
       </div>
 
-      <nav>
-        <button class="nav active">QC 대시보드</button>
-        <button class="nav">도면 인식 기준</button>
-        <button class="nav">배근 검토</button>
-        <button class="nav">길이 검토</button>
-        <button class="nav">물량 이상값</button>
-        <button class="nav">체크리스트</button>
-      </nav>
+      <div class="upload-box">
+        <label for="excelFile">엑셀 업로드</label>
+        <input type="file" id="excelFile" accept=".xlsx,.xls" />
+      </div>
+
+      <div class="side-section">
+        <h3>시트 목록</h3>
+        <div id="sheetButtons" class="sheet-buttons"></div>
+      </div>
     </aside>
 
     <main class="main">
       <header class="topbar">
         <div>
-          <h2>구조 적산 1차 QC 기획안</h2>
-          <p>도면 객체 · 배근 패턴 · 산출 물량을 기준으로 이상값을 빠르게 추출하는 검토 구조</p>
+          <h2>1차 QC 검토 화면</h2>
+          <p>산출식 열 안의 숫자값을 기준으로 수기입력 오류 가능성을 빠르게 확인합니다.</p>
         </div>
-        <button class="primary">QC 결과 내보내기</button>
+        <div class="file-name" id="fileName">업로드된 파일 없음</div>
       </header>
 
-      <section class="summary-grid">
+      <section class="cards">
         <div class="card">
-          <span>전체 검토 항목</span>
-          <strong>128</strong>
-          <p>부재 / 배근 / 길이 / 물량</p>
+          <span>선택 시트</span>
+          <strong id="selectedSheet">-</strong>
+        </div>
+        <div class="card">
+          <span>전체 행</span>
+          <strong id="totalRows">0</strong>
         </div>
         <div class="card danger">
-          <span>위험</span>
-          <strong>12</strong>
-          <p>즉시 확인 필요</p>
+          <span>경고 행</span>
+          <strong id="warningRows">0</strong>
         </div>
-        <div class="card warning">
-          <span>주의</span>
-          <strong>31</strong>
-          <p>오차 가능성 있음</p>
-        </div>
-        <div class="card safe">
-          <span>정상</span>
-          <strong>85</strong>
-          <p>기준 범위 내</p>
+        <div class="card">
+          <span>기준값</span>
+          <strong id="limitValue">-</strong>
         </div>
       </section>
 
       <section class="panel">
         <div class="panel-head">
-          <h3>1차 QC 흐름</h3>
-          <p>도면 전체를 사람이 직접 읽는 방식이 아니라, CAD 객체와 배근 패턴을 기준으로 오류 가능성이 높은 항목만 추출합니다.</p>
-        </div>
-
-        <div class="flow">
-          <div class="flow-item">
-            <b>01</b>
-            <h4>CAD 객체 추출</h4>
-            <p>TEXT, DIM, POLYLINE, BLOCK, LAYER 정보를 읽어 부재 후보를 생성</p>
-          </div>
-          <div class="flow-item">
-            <b>02</b>
-            <h4>배근 패턴 인식</h4>
-            <p>D13@200, 4-D25, HD22 등 배근 문자열을 자동 탐색</p>
-          </div>
-          <div class="flow-item">
-            <b>03</b>
-            <h4>부재-배근 연결</h4>
-            <p>부재명 주변 반경 기준으로 배근 텍스트를 연결</p>
-          </div>
-          <div class="flow-item">
-            <b>04</b>
-            <h4>적산값 비교</h4>
-            <p>산출 물량과 도면 기준값을 비교해 이상값 자동 표시</p>
+          <div>
+            <h3>QC 기능 버튼</h3>
+            <p>현재 활성화 기능: 1. 수기입력 오류 확인</p>
           </div>
         </div>
-      </section>
 
-      <section class="content-grid">
-        <div class="panel">
-          <div class="panel-head">
-            <h3>QC 검토 기준</h3>
-          </div>
-
-          <table>
-            <thead>
-              <tr>
-                <th>구분</th>
-                <th>검토 기준</th>
-                <th>판정</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>배근</td>
-                <td>D13@200, 4-D25 등 배근 패턴 누락 여부</td>
-                <td><span class="badge warning">주의</span></td>
-              </tr>
-              <tr>
-                <td>길이</td>
-                <td>부재 길이 대비 철근 길이 과다/과소 여부</td>
-                <td><span class="badge danger">위험</span></td>
-              </tr>
-              <tr>
-                <td>물량</td>
-                <td>동일 타입 부재 간 철근량 편차</td>
-                <td><span class="badge danger">위험</span></td>
-              </tr>
-              <tr>
-                <td>중복</td>
-                <td>동일 좌표, 동일 부재명, 동일 수량 중복 여부</td>
-                <td><span class="badge warning">주의</span></td>
-              </tr>
-              <tr>
-                <td>층별 비교</td>
-                <td>층별 물량 급변 여부</td>
-                <td><span class="badge safe">정상</span></td>
-              </tr>
-            </tbody>
-          </table>
+        <div class="qc-actions">
+          <button id="manualCheckBtn" class="primary" disabled>1. 수기입력 오류 확인</button>
+          <button class="disabled" disabled>2. 배근 간격 검토</button>
+          <button class="disabled" disabled>3. 길이 과다 검토</button>
+          <button class="disabled" disabled>4. 중복 산출 검토</button>
+          <button class="disabled" disabled>5. 층별 물량 편차 검토</button>
         </div>
 
-        <div class="panel">
-          <div class="panel-head">
-            <h3>도면 인식 방식</h3>
-          </div>
-
-          <div class="method-box">
-            <h4>Anchor Point 방식</h4>
-            <p>
-              도면 템플릿이 달라도 부재명, 배근 텍스트, 치수, 레이어명은 존재합니다.
-              따라서 고정 좌표로 읽지 않고, 부재명을 기준점으로 삼아 주변 배근 정보를 탐색합니다.
-            </p>
-          </div>
-
-          <div class="logic">
-            <div>Beam B1 인식</div>
-            <span>↓</span>
-            <div>주변 500~1000mm 탐색</div>
-            <span>↓</span>
-            <div>4-D25 / D13@150 연결</div>
-            <span>↓</span>
-            <div>적산 데이터 비교</div>
-          </div>
+        <div id="manualInputArea" class="manual-area hidden">
+          <label>기준 숫자 입력</label>
+          <input type="number" id="manualLimit" min="0" max="9999" placeholder="0~9999 입력" />
+          <button id="runManualCheck">검토 실행</button>
+          <p>
+            예: 500 입력 시, <b>산출식</b> 열 안에 500보다 큰 숫자가 포함된 행을 경고로 표시합니다.
+          </p>
         </div>
       </section>
 
       <section class="panel">
         <div class="panel-head row">
           <div>
-            <h3>QC 경고 리스트</h3>
-            <p>QC팀은 전체 물량을 다시 계산하지 않고, 위험도가 높은 항목만 우선 검토합니다.</p>
+            <h3>검토 결과</h3>
+            <p id="resultMessage">엑셀을 업로드한 후 시트를 선택하세요.</p>
           </div>
-          <select id="riskFilter">
-            <option value="all">전체</option>
-            <option value="danger">위험</option>
-            <option value="warning">주의</option>
-            <option value="safe">정상</option>
-          </select>
+          <button id="showAllBtn" class="sub" disabled>전체 행 보기</button>
         </div>
 
-        <table>
-          <thead>
-            <tr>
-              <th>상태</th>
-              <th>부재</th>
-              <th>검토 항목</th>
-              <th>도면 기준</th>
-              <th>적산 결과</th>
-              <th>차이</th>
-              <th>조치</th>
-            </tr>
-          </thead>
-          <tbody id="qcTable"></tbody>
-        </table>
-      </section>
-
-      <section class="panel">
-        <div class="panel-head">
-          <h3>1차 개발 범위</h3>
-        </div>
-
-        <div class="scope-grid">
-          <div>
-            <h4>필수 기능</h4>
-            <ul>
-              <li>CAD 객체 기반 텍스트 추출</li>
-              <li>배근 패턴 자동 인식</li>
-              <li>부재명 주변 탐색</li>
-              <li>적산 결과 엑셀 업로드</li>
-              <li>위험/주의/정상 자동 분류</li>
-            </ul>
-          </div>
-          <div>
-            <h4>추가 기능</h4>
-            <ul>
-              <li>검토자 배정</li>
-              <li>체크리스트 자동 생성</li>
-              <li>검토 완료 이력 저장</li>
-              <li>프로젝트별 QC 리포트</li>
-              <li>그룹웨어 업무일지 연동</li>
-            </ul>
-          </div>
+        <div class="table-wrap">
+          <table id="resultTable">
+            <thead></thead>
+            <tbody></tbody>
+          </table>
         </div>
       </section>
     </main>
